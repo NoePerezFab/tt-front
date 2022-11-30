@@ -1,17 +1,43 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
+import AnyChart from 'anychart-react'
+import anychart from 'anychart'
 import Menu from './Menu'
-import graf from '../images/descarga.png'
 
 const Monitoreo = () => {
+
+  
+
+let count = 50;
+let rawData = [];
+for (let i = 0; i < count; i++) {
+  rawData.push([i, Math.random() * 2])
+}
+let dataSet = anychart.data.set(rawData);
+
+
+let counter = count;
+setInterval(function() {
+  dataSet.remove(0);
+  dataSet.append([counter++, Math.random() * 2])
+}, 500);
+
+
+
+
   return (
     <>
         <Menu/>
-        <img src={graf} alt="" className='' /> 
-        <img src={graf} alt="" className='h-40 w-30' />
-        <img src={graf} alt="" className='h-30 w-30' />
-        <img src={graf} alt="" className='' /> 
-        <img src={graf} alt="" className='h-30 w-30' />
-        <img src={graf} alt="" className='h-30 w-30' />
+        <div className='w-100 h-100 d-flex justify-content-center align-items-center'>
+        <AnyChart
+    id="lineChart"
+    width={800}
+    height={600}
+    type="line"
+    data={dataSet}
+    title="Patadas por segundo"
+  />
+  </div>
     </>
   )
 }
