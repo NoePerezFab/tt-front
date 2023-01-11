@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Menu = () => {
   return (
@@ -13,7 +14,10 @@ const Menu = () => {
         <a class="nav-link" href="#/monitoreo">Monitoreo <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#/monitoreo">Registro de alumnos</a>
+        <a class="nav-link" href="#/crear-rutina">Crear Rutina</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#/rutinas">Rutinas Guardadas</a>
       </li>
     </ul>
   </div>

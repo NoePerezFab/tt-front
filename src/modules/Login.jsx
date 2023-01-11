@@ -1,11 +1,38 @@
 import React, { useState } from 'react'
+import { useRef } from 'react';
 import {  Navigate } from "react-router-dom";
+import { env } from './env';
 const Login = () => {
 
   const [red, setred] = useState(0)
+  const enviroment = env;
+  const nombreUsuario = useRef(null)
+  const contrasena = useRef(null)
 
-  const login = () =>{
-    setred(1)
+
+  const login = async(e) =>{
+    e.preventDefault()
+    const usuario = {usuario: nombreUsuario.current.value, contrasena: contrasena.current.value};
+    const body = JSON.stringify(usuario)
+    const response = await fetch(enviroment.baseUrl+"/api/usuario/login",
+    { 
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        mode: 'cors', // 
+        body : body,
+        cache: 'default',
+      }
+      
+    )
+    if(response.ok){
+      const usuarioResposne = await response.json()
+      localStorage.setItem('usuario',JSON.stringify(usuarioResposne));
+      setred(1)
+    }else{
+      const textResponse = await response.text()
+      console.log(textResponse);
+    }
+    
   }
 
   return (
@@ -23,27 +50,25 @@ const Login = () => {
             <div className="col-md-6 col-lg-7 d-flex align-items-center">
               <div className="card-body p-4 p-lg-5 text-black">
 
-                <form>
+                <form onSubmit={login}>
 
-                  <div className="d-flex align-items-center mb-3 pb-1">
-                    <i className="fas fa-cubes fa-2x me-3" style={{color: "#ff6219"}}></i>
-                    <span className="h1 fw-bold mb-0">Logo</span>
-                  </div>
 
                   <h5 className="fw-normal mb-3 pb-3" style={{letterSpacing: "1px"}}>Ingresar</h5>
 
                   <div className="form-outline mb-4">
-                    <input type="text" id="form2Example17" className="form-control form-control-lg" />
                     <label className="form-label" htmlFor="form2Example17">Usuario</label>
+                    <input type="text" id="form2Example17" className="form-control form-control-lg" ref={nombreUsuario} />
+                    
                   </div>
 
                   <div className="form-outline mb-4">
-                    <input type="password" id="form2Example27" className="form-control form-control-lg" />
-                    <label className="form-label" htmlFor="form2Example27">Contraserña</label>
+                  <label className="form-label" htmlFor="form2Example27">Contraserña</label>
+                    <input type="password" id="form2Example27" className="form-control form-control-lg" ref={contrasena}/>
+                    
                   </div>
 
                   <div className="pt-1 mb-4">
-                    <button className="btn btn-dark btn-lg btn-block" style={{backgroundColor : "#3B83BD"}} type="button" onClick={login}>Login</button>
+                    <button className="btn btn-dark btn-lg btn-block" style={{backgroundColor : "#3B83BD"}} type="submit">Login</button>
                   </div>
                 </form>
 
