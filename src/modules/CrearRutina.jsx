@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { env } from "./env";
 import Menu from "./Menu";
 
-const CrearRutina = () => {
+const CrearRutina = ({menuActive,setmenuActive}) => {
   const [usuario, setusuario] = useState(null);
   const [red, setred] = useState(0);
   const tiempoTotalMin = useRef(null);
@@ -18,6 +18,7 @@ const CrearRutina = () => {
       setred(1);
     }
     setusuario(JSON.parse(usuario));
+    setmenuActive(1);
   }, []);
 
   const onChangeTiempoEnvio = () => {
@@ -76,17 +77,18 @@ const CrearRutina = () => {
 
   return red === 0 ? (
     <>
-      <Menu />
-      <form onSubmit={crearRutina}>
-      <div className="col-md-6 col-lg-7 d-flex align-items-center">
+      <Menu menuActive={menuActive} setmenuActive={setmenuActive} />
+      <form onSubmit={crearRutina} className="h-100">
+      <div className=" d-flex align-items-center h-100 justify-content-center text-center">
+        <div className="justify-content-center">
         <div className="card-body p-4 p-lg-5 text-black">
-          <h3 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>
+          <h2 className="fw-normal mb-3 pb-3" style={{ letterSpacing: "1px" }}>
             Crear rutina
-          </h3>
+          </h2>
 
           <div className="form-outline mb-4">
             <label className="form-label" htmlFor="form2Example17">
-              Tiempo total
+             <h4> Tiempo total</h4>
             </label>
             <div className="row">
               <div className="col">
@@ -118,7 +120,7 @@ const CrearRutina = () => {
 
           <div className="form-outline mb-4">
             <label className="form-label" htmlFor="form2Example27">
-              Tiempo de envio
+              <h4>Tiempo de envio</h4>
             </label>
             <input
             onInput={onChangeTiempoEnvio}
@@ -132,13 +134,14 @@ const CrearRutina = () => {
 
           <div className="pt-1 mb-4">
             <button
-              className="btn btn-dark btn-lg btn-block"
+              className="btn btn-dark btn-lg"
               style={{ backgroundColor: "#3B83BD" }}
               type="submit"
             >
               Crear
             </button>
           </div>
+        </div>
         </div>
       </div>
       </form>

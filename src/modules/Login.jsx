@@ -80,7 +80,7 @@ const Login = () => {
     </div>
   </div>
 </section>:
-<Navigate to={"/monitoreo"}/>
+<Navigate to={"/crear-rutina"}/>
   )
 }
 
