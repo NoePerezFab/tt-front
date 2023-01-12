@@ -4,10 +4,12 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { env } from "./env";
 import Menu from "./Menu";
+import Monitoreo from "./Monitoreo";
 
-const Rutinas = () => {
+const Rutinas = ({menuActive,setmenuActive}) => {
   const [red, setred] = useState(0);
   const [rutinas, setrutinas] = useState([]);
+  const [patadas, setpatadas] = useState(null)
   const enviroment = env;
   useEffect(() => {
     const getRutinas = async () => {
@@ -22,6 +24,7 @@ const Rutinas = () => {
           cache: "default",
         }
       );
+      setmenuActive(2);
       let responseJson = await response.json();
       responseJson = await responseJson.map((r) => {
         if (r.patadas.length > 0) {
@@ -51,6 +54,7 @@ const Rutinas = () => {
 
         return r;
       });
+      responseJson.reverse();
       console.log(responseJson);
       setrutinas(responseJson);
     };
@@ -62,9 +66,23 @@ const Rutinas = () => {
     getRutinas();
   }, []);
 
+  useEffect(() => {
+    if(menuActive === 2){
+      setred(0)
+    }
+  }, [menuActive])
+  
+
+  const mostrarGrafica = (e) => {
+    const selected = rutinas.filter(r => r.id == e.target.id)[0];
+    localStorage.setItem("rutinaMonitoreo",JSON.stringify(selected));
+    setpatadas(selected);
+    setred(2);
+  }
+
   return red === 0 ? (
     <>
-      <Menu />
+      <Menu menuActive={menuActive} setmenuActive={setmenuActive} />
       <div className="h-100 w-100 text-white">
         <table class="table table-dark">
           <thead class="thead-dark text-center">
@@ -74,6 +92,7 @@ const Rutinas = () => {
               <th scope="col">Promedio patadas/s</th>
               <th scope="col">Patada mas rapida</th>
               <th scope="col">Patada mas lenta</th>
+              <th scope="col">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-white text-center">
@@ -89,6 +108,9 @@ const Rutinas = () => {
                   <td>
                     {isNaN(e.masLenta) ? e.masLenta : e.masLenta + "s"}
                   </td>
+                  <td>
+                  <button className="btn btn-dark btn-lg" style={{backgroundColor : "#3B83BD"}} type="button" id={e.id} onClick={mostrarGrafica}>Ver grafica</button>
+                  </td>
                 </tr>
               );
             })}
@@ -96,9 +118,9 @@ const Rutinas = () => {
         </table>
       </div>
     </>
-  ) : (
+  ) : red == 1 ? (
     <Navigate to={"/"} />
-  );
+  ) : <Monitoreo data={patadas} menuActive={menuActive} setmenuActive={setmenuActive}/>
 };
 
 export default Rutinas;

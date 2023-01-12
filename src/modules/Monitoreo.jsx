@@ -6,7 +6,7 @@ import SockJsClient from "react-stomp";
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 
-const Monitoreo = () => {
+const Monitoreo = ({data,menuActive,setmenuActive}) => {
   const [red, setred] = useState(0);
   const [usuario, setusuario] = useState(null);
   const [rutina, setrutina] = useState(null);
@@ -16,11 +16,12 @@ const Monitoreo = () => {
   const [patadaMasRapida, setpatadaMasRapida] = useState(0);
   const [patadaMasLenta, setpatadaMasLenta] = useState(0);
 
-  const SOCKET_URL = "http://tt-server.ddns.net:8081/contador-patadas/ws";
+  const SOCKET_URL = "http://localhost:8080/ws";
 
   useEffect(() => {
     const usuario = localStorage.getItem("usuario");
     const rutina = localStorage.getItem("rutinaMonitoreo");
+    setmenuActive(3);
     if (usuario === null || usuario === undefined) {
       setred(1);
     }
@@ -31,6 +32,63 @@ const Monitoreo = () => {
     const rutinaJson = JSON.parse(rutina);
     setusuario(JSON.parse(usuario));
     setrutina(rutinaJson);
+    if(data !== null && data !== undefined){
+
+      const m = data;
+      console.log(m);
+      let patadas =  m.patadas.map((p) => p.tiempo);
+    patadas =  patadas.filter((p, i) => patadas.indexOf(p) === i);
+      if (patadas.length > 0) {
+        console.log(Math.max(...patadas));
+        let ciclos = 0;
+          ciclos = ciclos = Math.ceil(m.tiempo / m.tiempoEnvio);
+  
+        console.log(ciclos);
+        let graficaTemp = [];
+        const intervaloCiclo = intervalo !== 0 ? intervalo : m.tiempoEnvio;
+        console.log(intervaloCiclo);
+        graficaTemp.push([0, 0]);
+        for (let i = 1; i <= ciclos; i++) {
+          const patadasPorCiclo = patadas.filter(
+            (p) => p <= i * intervaloCiclo && p > (i - 1) * intervaloCiclo
+          );
+          console.log(patadasPorCiclo);
+          graficaTemp.push([(i * intervaloCiclo) / 1000, patadasPorCiclo.length]);
+        }
+        setpatadas(graficaTemp);
+        console.log(graficaTemp);
+  
+        let masRapida = patadas[0];
+        let masLenta = patadas[0];
+        let anterior = 0;
+        patadas.map((p) => {
+          if (p - anterior < masRapida) {
+            masRapida = p - anterior;
+          }  
+          if(p-anterior > masLenta){
+            masLenta = p - anterior;
+          }
+          anterior = p;
+        });
+        setpatadaMasRapida(masRapida);
+        setpatadaMasLenta(masLenta);
+      } else {
+        let ciclos = 0;
+        if (intervalo === 0) {
+          ciclos = ciclos = Math.ceil(time / m.tiempoEnvio);
+        } else {
+          ciclos = ciclos = Math.ceil((time + intervalo) / intervalo);
+          console.log(time);
+          console.log(time / intervalo);
+        }
+        let graficaTemp = [];
+        for (let i = 1; i <= ciclos; i++) {
+          graficaTemp.push([(i * intervalo) / 1000, 0]);
+        }
+        setpatadas(graficaTemp);
+        console.log(graficaTemp);
+      }
+    }
   }, []);
 
   const onMessageReceived = async (m) => {
@@ -101,7 +159,7 @@ const Monitoreo = () => {
 
   return red === 0 ? (
     <>
-      {rutina && rutina.id ? (
+      {rutina && rutina.id && !data ? (
         <>
           <SockJsClient
             url={SOCKET_URL}
@@ -116,7 +174,7 @@ const Monitoreo = () => {
         <></>
       )}
 
-      <Menu />
+      <Menu menuActive={menuActive} setmenuActive={setmenuActive} />
       <div className="w-100 h-100 d-flex justify-content-center align-items-center">
         <AnyChart
           id="lineChart"
